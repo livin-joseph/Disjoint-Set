@@ -108,7 +108,7 @@ void deleteElement(int d,vector<head*>& setHeads,unordered_map<int,int>& repTabl
             node* p = ptr->first;
             if(p->link == NULL)
             {
-               
+               //Incomplete
                delete ptr;
             }
          }
