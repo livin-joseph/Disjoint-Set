@@ -108,9 +108,37 @@ void deleteElement(int d,vector<head*>& setHeads,unordered_map<int,int>& repTabl
             node* p = ptr->first;
             if(p->link == NULL)
             {
-               //Incomplete
+               setHeads.erase(setHeads.begin() + i);
+               delete p;
                delete ptr;
             }
+            else
+            {
+               setHeads[i]->first = p->link;
+               setHeads[i]->n = setHeads[i]->n - 1;
+               repTable[p->data] = 0;
+               changeRep(repTable,p->link,p->link->data);
+            }
+         }
+      }
+   }
+   else
+   {
+      int rep = repTable[d];
+      for(int i = 0; i < setHeads.size(); i++)
+      {
+         head* ptr = setHeads[i];
+         if(ptr->first->data == rep)
+         {
+            node* p = ptr->first;
+            while(p->link->data != d)
+            {
+               p = p->link;
+            }
+            node* temp = p->link;
+            p->link = p->link->link;
+            delete temp;
+            setHeads[i]->n = setHeads[i]->n - 1;
          }
       }
    }
@@ -146,7 +174,8 @@ int main()
       cout<<"1. Make set"<<endl;
       cout<<"2. Find"<<endl;
       cout<<"3. Union"<<endl;
-      cout<<"4. Display all sets"<<endl;
+      cout<<"4. Delete an element"<<endl;
+      cout<<"5. Display all sets"<<endl;
       cout<<"0. Exit"<<endl;
       cout<<"Enter your choice: ";
       cin>>choice;
@@ -186,6 +215,20 @@ int main()
          }
          case 4:
          {
+            int d;
+            cout<<"Enter the element to be deleted: ";
+            cin>>d;
+            if(repTable[d] != 0)
+            {
+               deleteElement(d,setHeads,repTable);
+               cout<<"Deletion is successful"<<endl;
+            }
+            else
+               cout<<"Element not found"<<endl;
+            break;
+         }
+         case 5:
+         {
             display(setHeads);
             break;
          }
@@ -200,4 +243,5 @@ int main()
       }
    }
    while(choice != 0);
+   return 0;
 }
