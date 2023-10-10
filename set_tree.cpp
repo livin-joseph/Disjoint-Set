@@ -7,58 +7,45 @@ using namespace std;
 typedef struct Node
 {
    int data;
-   Node* link;
+   int rank;
+   Node* parent;
 
    Node(int d)
    {
       data = d;
-      link = NULL;
+      rank = 0;
+      parent = NULL;
    }
 }
 node;
 
-typedef struct Head
-{
-   int n;
-   node* first;
-   node* last;
-
-   Head()
-   {
-      n = 0;
-      first = last = NULL;
-   }
-}
-head;
-
-void makeset(int d,vector<head*>& setHeads,unordered_map<int,int>& repTable)
+void makeset(int d,unordered_map<int,node*>& addressTable)
 {
    node* t = new node(d);
-   head* h = new head();
-   h->n = 1;
-   h->first = h->last = t;
-   setHeads.push_back(h);
-   repTable[d] = d;
+   addressTable[d] = t;
 }
 
-int find(int d,unordered_map<int,int>& repTable)
+int find(int d,unordered_map<int,node*>& addressTable)
 {
-   return repTable[d];
+   node* t = addressTable[d];
+   while(t->parent != t)
+      t = t->parent;
+   return t->data;
 }
 
-void changeRep(unordered_map<int,int>& repTable,node* ptr,int rep)
+void changeRep(unordered_map<int,node*>& addressTable,node* ptr,int rep)
 {
    while(ptr != NULL)
    {
-      repTable[ptr->data] = rep;
+      addressTable[ptr->data] = rep;
       ptr = ptr->link;
    }
 }
 
-void Union(int a,int b,vector<head*>& setHeads,unordered_map<int,int>& repTable)
+void Union(int a,int b,unordered_map<int,node*>& addressTable)
 {
-   int repA = repTable[a];
-   int repB = repTable[b];
+   int repA = addressTable[a];
+   int repB = addressTable[b];
    head* A = NULL;
    head* B = NULL;
    int posA, posB;
@@ -78,7 +65,7 @@ void Union(int a,int b,vector<head*>& setHeads,unordered_map<int,int>& repTable)
    }
    if(A->n >= B->n)
    {
-      changeRep(repTable,B->first,A->first->data);
+      changeRep(addressTable,B->first,A->first->data);
       A->last->link = B->first;
       A->last = B->last;
       A->n = A->n + B->n;
@@ -87,7 +74,7 @@ void Union(int a,int b,vector<head*>& setHeads,unordered_map<int,int>& repTable)
    }
    else if(B->n > A->n)
    {
-      changeRep(repTable,A->first,B->first->data);
+      changeRep(addressTable,A->first,B->first->data);
       B->last->link = A->first;
       B->last = A->last;
       B->n = A->n + B->n;
@@ -96,9 +83,9 @@ void Union(int a,int b,vector<head*>& setHeads,unordered_map<int,int>& repTable)
    }
 }
 
-void deleteElement(int d,vector<head*>& setHeads,unordered_map<int,int>& repTable)
+void deleteElement(int d,unordered_map<int,node*>& addressTable)
 {
-   if(repTable[d] == d)
+   if(addressTable[d] == d)
    {
       for(int i = 0; i < setHeads.size(); i++)
       {
@@ -116,15 +103,15 @@ void deleteElement(int d,vector<head*>& setHeads,unordered_map<int,int>& repTabl
             {
                setHeads[i]->first = p->link;
                setHeads[i]->n = setHeads[i]->n - 1;
-               repTable[p->data] = 0;
-               changeRep(repTable,p->link,p->link->data);
+               addressTable[p->data] = 0;
+               changeRep(addressTable,p->link,p->link->data);
             }
          }
       }
    }
    else
    {
-      int rep = repTable[d];
+      int rep = addressTable[d];
       for(int i = 0; i < setHeads.size(); i++)
       {
          head* ptr = setHeads[i];
@@ -144,7 +131,7 @@ void deleteElement(int d,vector<head*>& setHeads,unordered_map<int,int>& repTabl
    }
 }
 
-void display(vector<head*> setHeads)
+void display(unordered_map<int,node*> addressTable)
 {
    for(head* ptr : setHeads)
    {
@@ -165,8 +152,7 @@ void display(vector<head*> setHeads)
 int main()
 {
    int choice;
-   vector<head*> setHeads;
-   unordered_map<int,int> repTable;
+   unordered_map<int,node*> addressTable;
    do
    {
       cout<<"==============="<<endl;
@@ -187,7 +173,7 @@ int main()
             int d;
             cout<<"Enter the element: ";
             cin>>d;
-            makeset(d,setHeads,repTable);
+            makeset(d,addressTable);
             cout<<"Makeset is successful"<<endl;
             break;
          }
@@ -196,8 +182,8 @@ int main()
             int d;
             cout<<"Enter the element: ";
             cin>>d;
-            if(find(d,repTable) != 0)
-               cout<<"Representative element: "<< find(d,repTable) <<endl;
+            if(find(d,addressTable) != 0)
+               cout<<"Representative element: "<< find(d,addressTable) <<endl;
             else
                cout<<"Element is not found"<<endl;
             break;
@@ -209,7 +195,7 @@ int main()
             cin>>a;
             cout<<"Enter the second element: ";
             cin>>b;
-            Union(a,b,setHeads,repTable);
+            Union(a,b,setHeads,addressTable);
             cout<<"Makeset is successful"<<endl;
             break;
          }
@@ -218,9 +204,9 @@ int main()
             int d;
             cout<<"Enter the element to be deleted: ";
             cin>>d;
-            if(repTable[d] != 0)
+            if(addressTable[d] != 0)
             {
-               deleteElement(d,setHeads,repTable);
+               deleteElement(d,setHeads,addressTable);
                cout<<"Deletion is successful"<<endl;
             }
             else
