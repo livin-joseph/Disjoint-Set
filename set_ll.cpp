@@ -210,7 +210,7 @@ int main()
             cout<<"Enter the second element: ";
             cin>>b;
             Union(a,b,setHeads,repTable);
-            cout<<"Makeset is successful"<<endl;
+            cout<<"Union is successful"<<endl;
             break;
          }
          case 4:
