@@ -33,15 +33,6 @@ int find(int d,unordered_map<int,node*>& addressTable)
    return t->data;
 }
 
-void changeRep(unordered_map<int,node*>& addressTable,node* ptr,int rep)
-{
-   while(ptr != NULL)
-   {
-      addressTable[ptr->data] = rep;
-      ptr = ptr->link;
-   }
-}
-
 void Union(int a,int b,unordered_map<int,node*>& addressTable)
 {
    int repA = addressTable[a];
